@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 import { run } from "@mermaid-js/mermaid-cli";
+import type { Viewport } from "puppeteer";
 
 interface CliOptions {
   input?: string;
@@ -19,38 +20,49 @@ function parseArgs(argv: string[]): CliOptions {
   const opts: CliOptions = {};
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
+    if (!arg) {
+      continue;
+    }
     switch (arg) {
       case "-i":
       case "--input":
-        opts.input = argv[++i];
+        opts.input = readOptionValue(argv, i, arg);
+        i++;
         break;
       case "-o":
       case "--output":
-        opts.output = argv[++i];
+        opts.output = readOptionValue(argv, i, arg);
+        i++;
         break;
       case "-f":
       case "--format":
-        opts.format = argv[++i] as "svg" | "png" | "pdf";
+        opts.format = readFormat(readOptionValue(argv, i, arg));
+        i++;
         break;
       case "-t":
       case "--theme":
-        opts.theme = argv[++i];
+        opts.theme = readOptionValue(argv, i, arg);
+        i++;
         break;
       case "-b":
       case "--background":
-        opts.backgroundColor = argv[++i];
+        opts.backgroundColor = readOptionValue(argv, i, arg);
+        i++;
         break;
       case "-w":
       case "--width":
-        opts.width = parseInt(argv[++i], 10);
+        opts.width = readInteger(readOptionValue(argv, i, arg), arg);
+        i++;
         break;
       case "-H":
       case "--height":
-        opts.height = parseInt(argv[++i], 10);
+        opts.height = readInteger(readOptionValue(argv, i, arg), arg);
+        i++;
         break;
       case "-s":
       case "--scale":
-        opts.scale = parseFloat(argv[++i]);
+        opts.scale = readNumber(readOptionValue(argv, i, arg), arg);
+        i++;
         break;
       case "-p":
       case "--pdfFit":
@@ -78,6 +90,41 @@ function parseArgs(argv: string[]): CliOptions {
     }
   }
   return opts;
+}
+
+function readOptionValue(argv: string[], index: number, option: string): string {
+  const value = argv[index + 1];
+  if (!value || value === "--") {
+    console.error(`Error: ${option} requires a value`);
+    process.exit(1);
+  }
+  return value;
+}
+
+function readFormat(value: string): "svg" | "png" | "pdf" {
+  if (value === "svg" || value === "png" || value === "pdf") {
+    return value;
+  }
+  console.error(`Error: Unsupported format: ${value}`);
+  process.exit(1);
+}
+
+function readInteger(value: string, option: string): number {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed)) {
+    console.error(`Error: ${option} must be an integer`);
+    process.exit(1);
+  }
+  return parsed;
+}
+
+function readNumber(value: string, option: string): number {
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed)) {
+    console.error(`Error: ${option} must be a number`);
+    process.exit(1);
+  }
+  return parsed;
 }
 
 function printHelp() {
@@ -122,13 +169,13 @@ async function main() {
     mermaidConfig.theme = opts.theme;
   }
 
-  const viewport: puppeteer.Viewport = {
+  const viewport: Viewport = {
     width: opts.width ?? 1200,
     height: opts.height ?? 800,
     deviceScaleFactor: opts.scale ?? 1,
   };
 
-  await run(opts.input, opts.output, {
+  await run(opts.input, opts.output as Parameters<typeof run>[1], {
     quiet: opts.quiet,
     outputFormat,
     puppeteerConfig: {
@@ -149,5 +196,3 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-
-import puppeteer from "puppeteer";

@@ -1,15 +1,42 @@
 {
   "name": "fishgirl",
+  "version": "0.1.0",
+  "description": "A Bun CLI for rendering Mermaid diagrams with mermaid-cli.",
   "module": "index.ts",
   "type": "module",
-  "private": true,
+  "license": "MIT",
+  "homepage": "https://www.npmjs.com/package/fishgirl",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clankercode/fishgirl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clankercode/fishgirl/issues"
+  },
+  "keywords": [
+    "bun",
+    "cli",
+    "mermaid",
+    "diagram",
+    "svg",
+    "png",
+    "pdf"
+  ],
+  "files": [
+    "index.ts",
+    "README.md"
+  ],
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "bin": {
     "fishgirl": "./index.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
+    "@types/bun": "latest",
     "typescript": "^5"
   },
   "dependencies": {
