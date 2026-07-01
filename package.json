@@ -6,6 +6,10 @@
   "type": "module",
   "license": "MIT",
   "homepage": "https://www.npmjs.com/package/fishgirl",
+  "packageManager": "bun@1.3.13",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clankercode/fishgirl.git"
@@ -23,6 +27,7 @@
     "pdf"
   ],
   "files": [
+    "dist",
     "index.ts",
     "README.md"
   ],
@@ -30,10 +35,12 @@
     "bun": ">=1.0.0"
   },
   "scripts": {
+    "build": "bun build ./index.ts --target=bun --packages=external --outfile=dist/fishgirl.js",
+    "prepack": "bun run typecheck && bun run build",
     "typecheck": "tsc --noEmit"
   },
   "bin": {
-    "fishgirl": "./index.ts"
+    "fishgirl": "dist/fishgirl.js"
   },
   "devDependencies": {
     "@types/bun": "latest",

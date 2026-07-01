@@ -6,6 +6,12 @@ Render Mermaid diagrams from the command line using Bun and
 ## Install
 
 ```sh
+npm install -g fishgirl
+```
+
+or:
+
+```sh
 bun add -g fishgirl
 ```
 
